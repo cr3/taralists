@@ -27,6 +27,73 @@ services:
       timeout: 5s
       retries: 15
 
+  database:
+    image: postgres:16-alpine
+    volumes:
+      - mailman-database-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=mailmandb
+      - POSTGRES_USER=mailman
+      - POSTGRES_PASSWORD=${MAILMAN_DB_PASS}
+    networks:
+      default:
+        aliases:
+          - taralists-database
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready --dbname mailmandb --username mailman" ]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailman-core:
+    image: maxking/mailman-core:0.4
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - mailman-core-data:/opt/mailman/
+      - ./mailman/mailman-extra.cfg:/opt/mailman/mailman-extra.cfg:ro
+    environment:
+      - DATABASE_URL=postgresql://mailman:${MAILMAN_DB_PASS}@taralists-database/mailmandb
+      - DATABASE_TYPE=postgres
+      - DATABASE_CLASS=mailman.database.postgresql.PostgreSQLDatabase
+      - HYPERKITTY_API_KEY=${HYPERKITTY_API_KEY}
+      - MTA=postfix
+      - TZ=${TZ}
+    networks:
+      default:
+        aliases:
+          - taralists-mailman-core
+    restart: always
+    stop_grace_period: 30s
+
+  mailman-web:
+    image: maxking/mailman-web:0.4
+    depends_on:
+      database:
+        condition: service_healthy
+      mailman-core:
+        condition: service_started
+    volumes:
+      - mailman-web-data:/opt/mailman-web-data
+      - ./mailman/settings_local.py:/opt/mailman-web-data/settings_local.py:ro
+    environment:
+      - DATABASE_URL=postgresql://mailman:${MAILMAN_DB_PASS}@taralists-database/mailmandb
+      - DATABASE_TYPE=postgres
+      - HYPERKITTY_API_KEY=${HYPERKITTY_API_KEY}
+      - SECRET_KEY=${SECRET_KEY}
+      - SERVE_FROM_DOMAIN=${SERVER_HOSTNAME}
+      - MAILMAN_ADMIN_USER=${MAILMAN_ADMIN_USER}
+      - MAILMAN_ADMIN_EMAIL=${MAILMAN_ADMIN_EMAIL}
+      - TZ=${TZ}
+    networks:
+      default:
+        aliases:
+          - taralists-mailman-web
+    restart: always
+
   nginx:
     build: nginx
     depends_on:
@@ -65,3 +132,6 @@ networks:
 volumes:
   certbot-certs:
   certbot-www:
+  mailman-core-data:
+  mailman-database-data:
+  mailman-web-data:
