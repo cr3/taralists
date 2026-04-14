@@ -8,7 +8,7 @@ services:
       - certbot-certs:/etc/letsencrypt
       - certbot-www:/var/www/html
     environment:
-      - SERVER_HOSTNAME=${SERVER_HOSTNAME}
+      SERVER_HOSTNAME: ${SERVER_HOSTNAME}
     networks:
       default:
         aliases:
@@ -34,9 +34,9 @@ services:
     secrets:
       - dbpass
     environment:
-      - POSTGRES_DB=${DBNAME}
-      - POSTGRES_USER=${DBUSER}
-      - POSTGRES_PASSWORD_FILE=/run/secrets/dbpass
+      POSTGRES_DB: ${DBNAME}
+      POSTGRES_USER: ${DBUSER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/dbpass
     networks:
       default:
         aliases:
@@ -58,13 +58,13 @@ services:
       - mailman-core-data:/opt/mailman/
       - ./mailman-core/mailman-extra.cfg:/opt/mailman/mailman-extra.cfg:ro
     environment:
-      - DATABASE_URL=postgresql://${DBUSER}:${DBPASS}@taralists-database/${DBNAME}
-      - DATABASE_TYPE=postgres
-      - DATABASE_CLASS=mailman.database.postgresql.PostgreSQLDatabase
-      - HYPERKITTY_API_KEY=${HYPERKITTY_API_KEY}
-      - HYPERKITTY_URL=http://taralists-mailman-web:8000/hyperkitty
-      - MTA=postfix
-      - TZ=${TZ}
+      DATABASE_URL: postgresql://${DBUSER}:${DBPASS}@taralists-database/${DBNAME}
+      DATABASE_TYPE: postgres
+      DATABASE_CLASS: mailman.database.postgresql.PostgreSQLDatabase
+      HYPERKITTY_API_KEY: ${HYPERKITTY_API_KEY}
+      HYPERKITTY_URL: http://taralists-mailman-web:8000/hyperkitty
+      MTA: postfix
+      TZ: ${TZ}
     networks:
       default:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.241
@@ -84,15 +84,15 @@ services:
       - mailman-web-data:/opt/mailman-web-data
       - ./mailman-web/settings_local.py:/opt/mailman-web-data/settings_local.py
     environment:
-      - DATABASE_URL=postgresql://${DBUSER}:${DBPASS}@taralists-database/${DBNAME}
-      - DATABASE_TYPE=postgres
-      - HYPERKITTY_API_KEY=${HYPERKITTY_API_KEY}
-      - SECRET_KEY=${SECRET_KEY}
-      - MAILMAN_HOSTNAME=${IPV4_NETWORK:-172.22.1}.241
-      - SERVE_FROM_DOMAIN=${SERVER_HOSTNAME}
-      - MAILMAN_ADMIN_USER=${MAILMAN_ADMIN_USER}
-      - MAILMAN_ADMIN_EMAIL=${MAILMAN_ADMIN_EMAIL}
-      - TZ=${TZ}
+      DATABASE_URL: postgresql://${DBUSER}:${DBPASS}@taralists-database/${DBNAME}
+      DATABASE_TYPE: postgres
+      HYPERKITTY_API_KEY: ${HYPERKITTY_API_KEY}
+      SECRET_KEY: ${SECRET_KEY}
+      MAILMAN_HOSTNAME: ${IPV4_NETWORK:-172.22.1}.241
+      SERVE_FROM_DOMAIN: ${SERVER_HOSTNAME}
+      MAILMAN_ADMIN_USER: ${MAILMAN_ADMIN_USER}
+      MAILMAN_ADMIN_EMAIL: ${MAILMAN_ADMIN_EMAIL}
+      TZ: ${TZ}
     networks:
       default:
         aliases:
@@ -107,9 +107,9 @@ services:
     volumes:
       - mailman-core-data:/opt/mailman/:ro
     environment:
-      - SERVER_HOSTNAME=${SERVER_HOSTNAME}
-      - RELAYHOST=${RELAYHOST:-taramail-postfix}
-      - RELAYHOST_PORT=${RELAYHOST_PORT:-25}
+      SERVER_HOSTNAME: ${SERVER_HOSTNAME}
+      RELAYHOST: ${RELAYHOST:-taramail-postfix}
+      RELAYHOST_PORT: ${RELAYHOST_PORT:-25}
     networks:
       default:
         aliases:
@@ -132,8 +132,8 @@ services:
       - mailman-web-data:/opt/mailman-web-data:ro
       - ./nginx/conf.d/:/etc/nginx/conf.d/:z
     environment:
-      - SERVER_HOSTNAME=${SERVER_HOSTNAME}
-      - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
+      SERVER_HOSTNAME: ${SERVER_HOSTNAME}
+      IPV4_NETWORK: ${IPV4_NETWORK:-172.22.1}
     networks:
       default:
         ipv4_address: ${IPV4_NETWORK:-172.22.1}.240
@@ -160,7 +160,6 @@ volumes:
   mailman-core-data:
   mailman-web-data:
   mailman-database-data:
-
 
 secrets:
   dbpass:
