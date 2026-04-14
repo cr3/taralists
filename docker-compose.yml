@@ -28,7 +28,7 @@ services:
       retries: 15
 
   database:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     volumes:
       - mailman-database-data:/var/lib/postgresql/data
     secrets:
