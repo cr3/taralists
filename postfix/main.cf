@@ -1,0 +1,15 @@
+maillog_file = /dev/stdout
+
+myhostname = localhost
+mydestination =
+local_transport = error:no local delivery
+
+mynetworks = 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+
+relayhost = [localhost]:25
+
+recipient_delimiter = +
+owner_request_special = no
+
+transport_maps = hash:/opt/mailman/var/data/postfix_lmtp
+relay_domains = hash:/opt/mailman/var/data/postfix_domains

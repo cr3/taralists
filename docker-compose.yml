@@ -50,7 +50,7 @@ services:
       retries: 5
 
   mailman-core:
-    image: maxking/mailman-core:0.4
+    build: mailman-core
     depends_on:
       database:
         condition: service_healthy
@@ -62,10 +62,12 @@ services:
       - DATABASE_TYPE=postgres
       - DATABASE_CLASS=mailman.database.postgresql.PostgreSQLDatabase
       - HYPERKITTY_API_KEY=${HYPERKITTY_API_KEY}
+      - HYPERKITTY_URL=http://taralists-mailman-web:8000/hyperkitty
       - MTA=postfix
       - TZ=${TZ}
     networks:
       default:
+        ipv4_address: ${IPV4_NETWORK:-172.22.1}.241
         aliases:
           - taralists-mailman-core
     restart: always
@@ -80,12 +82,13 @@ services:
         condition: service_started
     volumes:
       - mailman-web-data:/opt/mailman-web-data
-      - ./mailman-web/settings_local.py:/opt/mailman-web-data/settings_local.py:ro
+      - ./mailman-web/settings_local.py:/opt/mailman-web-data/settings_local.py
     environment:
       - DATABASE_URL=postgresql://${DBUSER}:${DBPASS}@taralists-database/${DBNAME}
       - DATABASE_TYPE=postgres
       - HYPERKITTY_API_KEY=${HYPERKITTY_API_KEY}
       - SECRET_KEY=${SECRET_KEY}
+      - MAILMAN_HOSTNAME=${IPV4_NETWORK:-172.22.1}.241
       - SERVE_FROM_DOMAIN=${SERVER_HOSTNAME}
       - MAILMAN_ADMIN_USER=${MAILMAN_ADMIN_USER}
       - MAILMAN_ADMIN_EMAIL=${MAILMAN_ADMIN_EMAIL}
@@ -94,6 +97,26 @@ services:
       default:
         aliases:
           - taralists-mailman-web
+    restart: always
+
+  postfix:
+    build: postfix
+    depends_on:
+      mailman-core:
+        condition: service_started
+    volumes:
+      - mailman-core-data:/opt/mailman/:ro
+    environment:
+      - SERVER_HOSTNAME=${SERVER_HOSTNAME}
+      - RELAYHOST=${RELAYHOST:-taramail-postfix}
+      - RELAYHOST_PORT=${RELAYHOST_PORT:-25}
+    networks:
+      default:
+        aliases:
+          - taralists-postfix
+      taramail:
+        aliases:
+          - taralists-postfix
     restart: always
 
   nginx:
