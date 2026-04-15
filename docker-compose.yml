@@ -1,32 +1,7 @@
 name: taralists
-
+include:
+  - path: ./taracert/compose.yml
 services:
-  certbot:
-    image: certbot/certbot:v5.5.0
-    volumes:
-      - ./certbot/deploy-hook.sh:/deploy-hook.sh:ro
-      - certbot-certs:/etc/letsencrypt
-      - certbot-www:/var/www/html
-    environment:
-      SERVER_HOSTNAME: ${SERVER_HOSTNAME}
-    networks:
-      default:
-        aliases:
-          - taralists-certbot
-    command: >
-      sh -c "trap exit TERM; while :; do
-        certbot renew --webroot --webroot-path=/var/www/html --deploy-hook /deploy-hook.sh;
-        sleep 12h;
-      done"
-    entrypoint: ""
-    restart: always
-    healthcheck:
-      test: [ "CMD", "test", "-e", "/etc/letsencrypt/live/fullchain.pem" ]
-      start_period: 10s
-      interval: 10s
-      timeout: 5s
-      retries: 15
-
   database:
     image: postgres:18-alpine
     volumes:
@@ -56,7 +31,7 @@ services:
         condition: service_healthy
     volumes:
       - mailman-core-data:/opt/mailman/
-      - ./mailman-core/mailman-extra.cfg:/opt/mailman/mailman-extra.cfg:ro
+      - ./mailman-core/mailman-extra.cfg:/opt/mailman/mailman-extra.cfg
     environment:
       DATABASE_URL: postgresql://${DBUSER}:${DBPASS}@taralists-database/${DBNAME}
       DATABASE_TYPE: postgres
