@@ -39,6 +39,7 @@ services:
       HYPERKITTY_API_KEY: ${HYPERKITTY_API_KEY}
       HYPERKITTY_URL: http://taralists-mailman-web:8000/hyperkitty
       MTA: postfix
+      SERVER_HOSTNAME: ${SERVER_HOSTNAME}
       TZ: ${TZ}
     networks:
       default:
