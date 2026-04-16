@@ -31,7 +31,7 @@ services:
         condition: service_healthy
     volumes:
       - mailman-core-data:/opt/mailman/
-      - ./mailman-core/mailman-extra.cfg:/opt/mailman/mailman-extra.cfg
+      - ./mailman-core/mailman-extra.cfg:/etc/mailman/mailman-extra.cfg:ro
     environment:
       DATABASE_URL: postgresql://${DBUSER}:${DBPASS}@taralists-database/${DBNAME}
       DATABASE_TYPE: postgres
@@ -63,7 +63,7 @@ services:
         condition: service_healthy
     volumes:
       - mailman-web-data:/opt/mailman-web-data
-      - ./mailman-web/settings_local.py:/opt/mailman-web-data/settings_local.py
+      - ./mailman-web/settings_local.py:/etc/mailman-web/settings_local.py:ro
     environment:
       DATABASE_URL: postgresql://${DBUSER}:${DBPASS}@taralists-database/${DBNAME}
       DATABASE_TYPE: postgres
@@ -73,6 +73,7 @@ services:
       SERVE_FROM_DOMAIN: ${SERVER_HOSTNAME}
       MAILMAN_ADMIN_USER: ${MAILMAN_ADMIN_USER}
       MAILMAN_ADMIN_EMAIL: ${MAILMAN_ADMIN_EMAIL}
+      DJANGO_SUPERUSER_PASSWORD: ${MAILMAN_ADMIN_PASSWORD}
       TZ: ${TZ}
     networks:
       default:
