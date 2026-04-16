@@ -80,7 +80,7 @@ Setting up
     .. code-block:: text
 
         > git config --global credential.helper manager
-        > git clone https://github.com/cr3/taralists
+        > git clone https://github.com/taradix/taralists
         Cloning into 'taralists'...
 
     - Select "manager"
