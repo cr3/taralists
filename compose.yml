@@ -43,7 +43,6 @@ services:
       TZ: ${TZ}
     networks:
       default:
-        ipv4_address: ${IPV4_NETWORK:-172.22.1}.241
         aliases:
           - taralists-mailman-core
     restart: always
