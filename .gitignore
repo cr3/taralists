@@ -4,6 +4,9 @@
 # Lint checker
 node_modules/
 
+# pytest-xprocess cache
+.xprocess/
+
 # IDE specific files
 .vscode/
 .idea/
