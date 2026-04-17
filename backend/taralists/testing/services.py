@@ -78,6 +78,14 @@ def compose_server(project, env_file, compose_files, process):
 
 
 @pytest.fixture(scope="session")
+def database_service(compose_server):
+    """Database service fixture."""
+    server = compose_server("database system is ready to accept connections")
+    with server.run("database") as service:
+        yield service
+
+
+@pytest.fixture(scope="session")
 def postfix_service(compose_server):
     """Postfix service fixture."""
     server = compose_server("starting the Postfix mail system")
