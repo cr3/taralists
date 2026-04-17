@@ -11,5 +11,7 @@ relayhost = [localhost]:25
 recipient_delimiter = +
 owner_request_special = no
 
+smtpd_relay_restrictions = permit_mynetworks, reject_unauth_destination
+
 transport_maps = texthash:/opt/mailman/var/data/postfix_lmtp
 relay_domains = texthash:/opt/mailman/var/data/postfix_domains
