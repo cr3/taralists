@@ -54,7 +54,7 @@ def test_mailman_web_archive(mailman_web_service, env_vars):
     msg["Subject"] = "Integration test"
     msg["From"] = f"sender@{env_vars['SERVER_HOSTNAME']}"
     msg["To"] = f"test@{env_vars['SERVER_HOSTNAME']}"
-    msg["Message-ID"] = "<test-archive-001@test.local>"
+    msg["Message-ID"] = f"<test-archive-001@{env_vars['SERVER_HOSTNAME']}>"
     msg["Date"] = "Thu, 17 Apr 2026 00:00:00 +0000"
     msg.set_content("Integration test message body.")
     message_bytes = msg.as_bytes()

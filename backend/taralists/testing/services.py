@@ -1,5 +1,6 @@
 """Service fixtures."""
 
+import re
 from functools import partial
 from pathlib import Path
 
@@ -19,6 +20,7 @@ def env_vars(project):
 
     Static because they are persisted in volumes, e.g. database-vol-1.
     """
+    server_hostname = "test.local"
     return {
         "COMPOSE_PROJECT_NAME": project,
         "DBNAME": "test",
@@ -26,9 +28,9 @@ def env_vars(project):
         "DBPASS": "test",
         "HYPERKITTY_API_KEY": "test",
         "SECRET_KEY": "test",
-        "SERVER_HOSTNAME": "test.local",
+        "SERVER_HOSTNAME": server_hostname,
         "MAILMAN_ADMIN_USER": "admin",
-        "MAILMAN_ADMIN_EMAIL": "admin@test.local",
+        "MAILMAN_ADMIN_EMAIL": f"admin@{server_hostname}",
         "MAILMAN_ADMIN_PASSWORD": "test",
         "TZ": "UTC",
     }
@@ -94,9 +96,9 @@ def mailman_core_service(compose_server):
 
 
 @pytest.fixture(scope="session")
-def mailman_web_service(compose_server, mailman_core_service):
+def mailman_web_service(compose_server, mailman_core_service, env_vars):
     """Mailman-web service fixture."""
-    server = compose_server("Domain test\\.local")
+    server = compose_server(f"Domain {re.escape(env_vars['SERVER_HOSTNAME'])}")
     with server.run("mailman-web") as service:
         yield service
 
